@@ -5,17 +5,17 @@ import time
 px = Picarx()
 
 
-def forwards(angle,speed,time):
+def forwards(angle,speed,t):
     px.set_dir_servo_angle(angle)
     px.forward(speed)
-    time.sleep(time)
+    time.sleep(t)
     px.stop()
 
 #Instead of time, could change to distance
-def backwards(angle,speed,time):
+def backwards(angle,speed,t):
     px.set_dir_servo_angle(angle)
     px.backward(speed)
-    time.sleep(time)
+    time.sleep(t)
     px.stop()
 
 def parallel_park(side):
