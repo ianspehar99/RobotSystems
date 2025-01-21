@@ -1,5 +1,8 @@
-import picarx_improved as px
+#!/usr/bin/env python3
+from picarx_improved import Picarx 
 import time
+
+px = Picarx()
 
 
 def forwards(angle,speed,time):
