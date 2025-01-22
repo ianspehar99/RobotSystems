@@ -6,8 +6,11 @@ px = Picarx()
 
 
 def forwards(angle,speed,t):
+    print("rUNNING FW")
     px.set_dir_servo_angle(angle)
+    print("aNGLE SET")
     px.forward(speed)
+    print("PX FW called")
     time.sleep(t)
     px.stop()
 
@@ -39,6 +42,8 @@ def parallel_park(side):
         px.backward(speed)
         time.sleep(1)
         px.stop()
+
+
 
 
 
