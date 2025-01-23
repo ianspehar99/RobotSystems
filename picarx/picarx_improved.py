@@ -67,8 +67,7 @@ class Picarx(object):
             self.config_flie = fileDB(config, 777, os.getlogin())
         else:
             self.config_flie = fileDB(config, 777)
-        
-        
+
         # --------- servos init ---------
         self.cam_pan = Servo(servo_pins[0])
         self.cam_tilt = Servo(servo_pins[1])   
@@ -211,11 +210,11 @@ class Picarx(object):
             power_scale = 1 + math.sin(current_angle)
             if (current_angle / abs_current_angle) > 0:
                 #Assuming that the 
-                self.set_motor_speed(1, speed)
-                self.set_motor_speed(2, -1* speed * power_scale)
+                self.set_motor_speed(1, -1 *speed)
+                self.set_motor_speed(2,  speed * power_scale)
             else:
-                self.set_motor_speed(1, speed * power_scale)
-                self.set_motor_speed(2, -1* speed )
+                self.set_motor_speed(1, -1*speed * power_scale)
+                self.set_motor_speed(2, speed )
         else:
             self.set_motor_speed(1, -1*speed)
             self.set_motor_speed(2, speed)  
@@ -230,11 +229,11 @@ class Picarx(object):
             current_angle = math.radians(current_angle)
             power_scale = 1 + math.sin(current_angle)
             if (current_angle / abs_current_angle) > 0:
-                self.set_motor_speed(1, -1*speed * power_scale)
-                self.set_motor_speed(2, speed) 
+                self.set_motor_speed(1, 1*speed * power_scale)
+                self.set_motor_speed(2, -speed) 
             else:
-                self.set_motor_speed(1, -1* speed)
-                self.set_motor_speed(2, speed * power_scale)
+                self.set_motor_speed(1,  speed)
+                self.set_motor_speed(2, -1* speed * power_scale)
         else:
             self.set_motor_speed(1, speed)
             self.set_motor_speed(2, -1*speed)                  
