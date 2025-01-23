@@ -44,7 +44,7 @@ def parallel_park(side):
         px.stop()
 
 def k_turn(side):
-    angle = 30
+    angle = 20
     speed = 30
     if side == "left":
         px.set_dir_servo_angle(-1*angle)
