@@ -200,6 +200,7 @@ class Picarx(object):
         self.set_motor_speed(2, speed)
 
     def backward(self, speed):
+        print("Going backward")
         current_angle = self.dir_current_angle
         if current_angle != 0:
             abs_current_angle = abs(current_angle)
@@ -207,31 +208,41 @@ class Picarx(object):
                 abs_current_angle = self.DIR_MAX
             #power_scale = (100 - abs_current_angle) / 100.0 
             current_angle = math.radians(current_angle)
-            power_scale = 1 + math.sin(current_angle)
-            if (current_angle / abs_current_angle) > 0:
-                #Assuming that the 
-                self.set_motor_speed(1, -1 *speed)
-                self.set_motor_speed(2,  speed * power_scale)
+            print("Current angle radians: ", current_angle)
+            
+            abs_current_rad = abs(current_angle)
+            power_scale = 1 + math.sin(abs_current_rad)
+            print("power scale: ",power_scale)
+            if (current_angle / abs_current_rad) > 0:
+                self.set_motor_speed(1, -1 *speed*power_scale)
+                self.set_motor_speed(2,  speed)
             else:
-                self.set_motor_speed(1, -1*speed * power_scale)
-                self.set_motor_speed(2, speed )
+                self.set_motor_speed(1, -1*speed)
+                self.set_motor_speed(2, speed*power_scale )
         else:
             self.set_motor_speed(1, -1*speed)
             self.set_motor_speed(2, speed)  
 
     def forward(self, speed):
+        print("Going forward")
         current_angle = self.dir_current_angle
         if current_angle != 0:
             abs_current_angle = abs(current_angle)
             if abs_current_angle > self.DIR_MAX:
                 abs_current_angle = self.DIR_MAX
             #power_scale = (100 - abs_current_angle) / 100.0
+            print("Current angle: ",current_angle)
             current_angle = math.radians(current_angle)
-            power_scale = 1 + math.sin(current_angle)
-            if (current_angle / abs_current_angle) > 0:
+            print("Current angle radians:", current_angle)
+            abs_current_rad = abs(current_angle)
+            power_scale = 1+ math.sin(abs_current_rad)
+            print("Power scale: ",power_scale)
+            if (current_angle / abs_current_rad) > 0:
+                print("angle > 0, left motor faster")
                 self.set_motor_speed(1, 1*speed * power_scale)
                 self.set_motor_speed(2, -speed) 
             else:
+                print("angle <0, right motor faster")
                 self.set_motor_speed(1,  speed)
                 self.set_motor_speed(2, -1* speed * power_scale)
         else:
