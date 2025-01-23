@@ -22,9 +22,9 @@ def backwards(angle,speed,t):
     px.stop()
 
 def parallel_park(side):
-    speed = 10
-    reverse_angle_1 = 20
-    reverse_angle_2 = 20
+    speed = 40
+    reverse_angle_1 = 10
+    reverse_angle_2 = 10
     
     if side == "left":
         px.set_dir_servo_angle(-1*reverse_angle_1)
@@ -43,6 +43,31 @@ def parallel_park(side):
         time.sleep(1)
         px.stop()
 
+def k_turn(side):
+    angle = 30
+    speed = 30
+    if side == "left":
+        px.set_dir_servo_angle(-1*angle)
+        px.backward(speed)
+        time.sleep(2)
+        px.set_dir_servo_angle(1*angle)
+        px.forward(speed)
+        time.sleep(2)
+        px.set_dir_servo_angle(0)
+        px.forward(speed)
+        time.sleep(1)
+        px.stop()
+    else:
+        px.set_dir_servo_angle(1*angle)
+        px.backward(speed)
+        time.sleep(2)
+        px.set_dir_servo_angle(-1*angle)
+        px.forward(speed)
+        time.sleep(2)
+        px.set_dir_servo_angle(0)
+        px.forward(speed)
+        time.sleep(1)
+        px.stop()
 
 
 
