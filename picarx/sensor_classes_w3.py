@@ -1,5 +1,6 @@
-from adc import ADC
-from modules import Grayscale_Module
+from sim_robot_hat.adc import ADC
+from sim_robot_hat.modules import Grayscale_Module
+from picarx_improved import Picarx
 
 class SENSOR:
 
@@ -8,7 +9,7 @@ class SENSOR:
         self.pin2 = ADC("A1")
         self.pin3 = ADC("A2")
 
-        self.gs_mod = Grayscale_Module(pin1,pin2,pin3)
+        self.gs_mod = Grayscale_Module(self.pin1,self.pin2,self.pin3)
        
 
     def sensor_read(self):
@@ -18,14 +19,21 @@ class SENSOR:
 
 class INTERP:
 
-    def __init__(self, sensitivity = 600, polarity = 1, reference = 500):
+    def __init__(self, sensitivity = 600, polarity = 1, reference = 1000):
+        #If line is darker than background, use default polarity
+        #If line is lighter, set polarity to 0
+
         
         self.sensitivity = sensitivity
         self.polarity = polarity
         self.reference = reference
 
-    def position(self,sensor_val_list)
+    def get_position(self,sensor_val_list):
+        sensitivity = self.sensitivity
         sv = sensor_val_list
+        #Reverse everything if polarity switched
+        if self.polarity == 0:
+            sv = sv*-1
         #Compare left and middle:
         ref = self.reference
         Left = sv[0]
@@ -33,10 +41,11 @@ class INTERP:
         Right = sv[2]
         dif1 = Middle - Left
         dif2 = Right - Middle
-
+        position = None
         if abs(dif1) < sensitivity and abs(dif2) < sensitivity and sv[0] < ref:
             print("Car totally off course")
-        elif: abs(dif1) > sensitivity: 
+            position = None
+        elif abs(dif1) > sensitivity: 
             if abs(dif2) > sensitivity:
                 print("Car is centered")
                 position = 0
@@ -55,6 +64,21 @@ class INTERP:
             elif dif2 < 0:
                 print("Car at edge case to left")
                 position = 0.5
+        return position
+    
+
+class CONTROL:
+
+    def __init__(self, scale_factor = 5):
+        #Negative to correct the offset
+        self.scale_factor = -1*scale_factor
+
+    def correct_car(self,offset):
+        servo_angle = offset*self.scale_factor
+        px = Picarx()
+        px.set_dir_servo_angle(servo_angle)
+
+
 
 
 
