@@ -1,32 +1,28 @@
-from sim_robot_hat.adc import ADC
-from sim_robot_hat.modules import Grayscale_Module
+from robot_hat import ADC
+from robot_hat import Grayscale_Module
 from picarx_improved import Picarx
+px = Picarx()
 
 class SENSOR:
 
-    def __init__(self):
-        self.pin1 = ADC("A0")
-        self.pin2 = ADC("A1")
-        self.pin3 = ADC("A2")
-
-        self.gs_mod = Grayscale_Module(self.pin1,self.pin2,self.pin3)
-       
+    def __init__(self,px = px):
+        self.px = px
 
     def sensor_read(self):
-        sensor_values = self.gs_mod.read()
+        sensor_values = self.px.get_grayscale_data()
         return sensor_values
     
 
 class INTERP:
 
-    def __init__(self, sensitivity = 300, polarity = 1, reference = 1000):
+    def __init__(self, sensitivity = 300, polarity = 1, reference = 1000, px = px):
         #If line is darker than background, use default polarity
         #If line is lighter, set polarity to 0
 
         
         self.sensitivity = sensitivity
         self.polarity = polarity
-        self.reference = reference
+        self.reference = px.set_grayscale_reference()
 
     def get_position(self,sensor_val_list):
         sensitivity = self.sensitivity
@@ -44,7 +40,7 @@ class INTERP:
         position = None
         if abs(dif1) < sensitivity and abs(dif2) < sensitivity and sv[0] < ref:
             print("Car totally off course")
-            position = None
+            position = 2
         elif abs(dif1) > sensitivity: 
             if abs(dif2) > sensitivity:
                 print("Car is centered")
@@ -69,14 +65,15 @@ class INTERP:
 
 class CONTROL:
 
-    def __init__(self, scale_factor = 5):
+    def __init__(self, px = px, scale_factor = 10):
         #Negative to correct the offset
         self.scale_factor = -1*scale_factor
+        self.px = px
+        
 
     def correct_car(self,offset):
         servo_angle = offset*self.scale_factor
-        px = Picarx()
-        px.set_dir_servo_angle(servo_angle)
+        self.px.set_dir_servo_angle(servo_angle)
 
 
 

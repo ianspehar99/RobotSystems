@@ -1,8 +1,8 @@
 import os
 import math
 try:
-    from sim_robot_hat import Pin, ADC, PWM, Servo, fileDB
-    from sim_robot_hat import Grayscale_Module, Ultrasonic, utils
+    from robot_hat import Pin, ADC, PWM, Servo, fileDB
+    from robot_hat import Grayscale_Module, Ultrasonic, utils
     on_the_robot = True
 except ImportError:
     import sys
@@ -13,11 +13,11 @@ except ImportError:
     on_the_robot = False
 import time
 import atexit
-import logging
-from logdecorator import log_on_start, log_on_end, log_on_error
+#import logging
+#from logdecorator import log_on_start, log_on_end, log_on_error
 
-logging.basicConfig(format='%(asctime)s: %(message)s', level=logging.INFO,
-datefmt="%H:%M:%S")
+#logging.basicConfig(format='%(asctime)s: %(message)s', level=logging.INFO,
+#datefmt="%H:%M:%S")
 
 
 def constrain(x, min_val, max_val):
@@ -113,8 +113,8 @@ class Picarx(object):
         trig, echo= ultrasonic_pins
         self.ultrasonic = Ultrasonic(Pin(trig), Pin(echo, mode=Pin.IN, pull=Pin.PULL_DOWN))
     
-    @log_on_start(logging.DEBUG, "Changing motor speed")
-    @log_on_end(logging.DEBUG, "Motor {motor} speed set to {result}")
+    #@log_on_start(logging.DEBUG, "Changing motor speed")
+    #@log_on_end(logging.DEBUG, "Motor {motor} speed set to {result}")
     def set_motor_speed(self, motor, speed):
         ''' set motor speed
         

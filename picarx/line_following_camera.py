@@ -39,6 +39,7 @@ def calculate_angle(xval, frame_width):
 
 start = input("Press 'y' to begin line following. Once started, press 's' to stop")
 
+px.set_cam_tilt_angle(-20)
 speed = 25
 while start == "y":
     px.forward(speed)
