@@ -19,7 +19,7 @@ class SENSOR:
 
 class INTERP:
 
-    def __init__(self, sensitivity = 600, polarity = 1, reference = 1000):
+    def __init__(self, sensitivity = 300, polarity = 1, reference = 1000):
         #If line is darker than background, use default polarity
         #If line is lighter, set polarity to 0
 
@@ -53,17 +53,17 @@ class INTERP:
                 #Car is either on edge case to the right, or is left of center
                 if dif1 < 0:
                     print("car is to the left")
-                    position = -1
+                    position = -1*(dif1/sensitivity)
                 elif dif1 > 0:
                     print("car at edge case to the right")
-                    position = 0.5
+                    position = 0.5*(dif1/sensitivity)
         elif abs(dif1) < sensitivity:
             if dif2 > 0:
                 print("Car is to the right")
-                position = 1
+                position = 1*(dif2/sensitivity)
             elif dif2 < 0:
                 print("Car at edge case to left")
-                position = 0.5
+                position = 0.5*(dif2/sensitivity)
         return position
     
 

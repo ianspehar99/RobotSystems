@@ -1,43 +1,66 @@
 import cv2
 import numpy as np
 from vilib import Camera
+from picarx import Picarx
+px = Picarx()
+import time
 
-def process_frame(frame):
-    # Convert the frame to grayscale
+def find_line(frame):
+    #Greyscale
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     
-    # Apply a binary threshold to get a binary image
+    #Get binary image
     _, binary = cv2.threshold(gray, 60, 255, cv2.THRESH_BINARY_INV)
     
-    # Find contours in the binary image
+    #Find contours
     contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
-    # Draw contours on the original frame
-    cv2.drawContours(frame, contours, -1, (0, 255, 0), 2)
-    
-    return frame
+    center_line = max(contours, key = cv2.contourArea)
+    # Find the leftmost point of the largest contour
+    left_point = tuple(center_line[center_line[:,:,0].argmin()][0])
+        
+    # Get the x-coordinate of the leftmost point
+    xval = left_point[0]
+        
+    # Get the width of the frame
+    frame_width = frame.shape[1]
 
-def main():
-    # Initialize the camera
+    
+    return xval, frame_width
+
+def calculate_angle(xval, frame_width):
+
+    scale_factor = (frame_width/2 - xval-frame_width/20)/frame_width
+
+    return scale_factor*90
+
+
+
+
+start = input("Press 'y' to begin line following. Once started, press 's' to stop")
+
+speed = 25
+while start == "y":
+    px.forward(speed)
     camera = Camera()
+    frame = camera.read()
+    xval, frame_width = find_line(frame)    
+    angle = calculate_angle(xval, frame_width)  
+    px.set_dir_servo_angle(angle)
     
-    while True:
-        # Capture a frame from the camera
-        frame = camera.read()
-        
-        # Process the frame to detect the line
-        processed_frame = process_frame(frame)
-        
-        # Display the processed frame
-        cv2.imshow('Line Following', processed_frame)
-        
-        # Break the loop if 'q' is pressed
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-    
-    # Release the camera and close all OpenCV windows
-    camera.release()
-    cv2.destroyAllWindows()
+    time.sleep(0.1)
+    start = input("Press 's' to stop the car")
 
-if __name__ == "__main__":
-    main()
+
+        
+    
+
+    
+
+
+
+
+
+        
+       
+
