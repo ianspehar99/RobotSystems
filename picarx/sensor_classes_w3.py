@@ -1,28 +1,29 @@
 from robot_hat import ADC
 from robot_hat import Grayscale_Module
 from picarx_improved import Picarx
-px = Picarx()
 
-class SENSOR:
 
-    def __init__(self,px = px):
-        self.px = px
+class SENSOR(Picarx):
+
+    def __init__(self):
+        super().__init__()
 
     def sensor_read(self):
-        sensor_values = self.px.get_grayscale_data()
+        sensor_values = self.get_grayscale_data()
         return sensor_values
     
 
-class INTERP:
+class INTERP(Picarx):
 
-    def __init__(self, sensitivity = 300, polarity = 1, reference = 1000, px = px):
+    def __init__(self, sensitivity = 300, polarity = 1, reference = 1000):
         #If line is darker than background, use default polarity
         #If line is lighter, set polarity to 0
+        super().__init__()
 
         
         self.sensitivity = sensitivity
         self.polarity = polarity
-        self.reference = px.set_grayscale_reference()
+        self.reference = self.set_grayscale_reference()
 
     def get_position(self,sensor_val_list):
         sensitivity = self.sensitivity
@@ -63,17 +64,16 @@ class INTERP:
         return position
     
 
-class CONTROL:
+class CONTROL(Picarx):
 
-    def __init__(self, px = px, scale_factor = 10):
+    def __init__(self, scale_factor = 10):
         #Negative to correct the offset
         self.scale_factor = -1*scale_factor
-        self.px = px
-        
+        super().__init__()
 
     def correct_car(self,offset):
         servo_angle = offset*self.scale_factor
-        self.px.set_dir_servo_angle(servo_angle)
+        self.set_dir_servo_angle(servo_angle)
 
 
 

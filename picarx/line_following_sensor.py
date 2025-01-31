@@ -1,10 +1,11 @@
 from sensor_classes_w3 import SENSOR, INTERP,CONTROL, Picarx
 import time
+import keyboard 
 px = Picarx()
 
-s = SENSOR(px)
-i = INTERP(px = px)
-c = CONTROL(px)
+s = SENSOR()
+i = INTERP()
+c = CONTROL()
 
 start = input("Press 'y' to begin line following. Once started, press 's' to stop")
 
@@ -15,7 +16,9 @@ while start == "y":
     position = i.get_position(sensor_vals)
     c.correct_car(position)
     time.sleep(0.1)
-    start = input("Press 's' to stop the car")
+    if keyboard.is_pressed('s'):
+        px.stop()
+    
 
 
     
