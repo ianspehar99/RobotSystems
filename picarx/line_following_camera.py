@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from vilib import Camera
+from vilib import Vilib
 from picarx import Picarx
 px = Picarx()
 import time
@@ -40,11 +40,16 @@ def calculate_angle(xval, frame_width):
 start = input("Press 'y' to begin line following. Once started, press 's' to stop")
 
 px.set_cam_tilt_angle(-20)
+Vilib.camera_start()
+
+
+time.sleep(0.3)
 speed = 25
 while start == "y":
+    
+    frame = Vilib.display()
     px.forward(speed)
-    camera = Camera()
-    frame = camera.read()
+    
     xval, frame_width = find_line(frame)    
     angle = calculate_angle(xval, frame_width)  
     px.set_dir_servo_angle(angle)
