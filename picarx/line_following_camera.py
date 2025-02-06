@@ -65,7 +65,7 @@ time.sleep(0.5)
 speed = 25
 t = 1
 while start == "y":
-    name = f"image{t}"  # Ensure unique filenames
+    name = f"image{t}"  
     path = "picarx"
     
     status = Vilib.take_photo(name, path)  # Take the photo
