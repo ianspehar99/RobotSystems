@@ -35,16 +35,19 @@ class Bus:
     def write(self, data, identifier = None):
        with self.lock.gen_wlock():
             self.message = data
-            self.indentifier = identifier
+            self.identifier = identifier
 
 bus12 = Bus()  #Bus instance for transfer from sensor to interpreter
 
 bus23 = Bus() #Bus instance for transfer from interpreter to controller
 
 #Set delay for loops
-sensor_delay = 0.1
-interp_delay = 0.3
-control_delay = 0.6
+# 0.02
+# 0.1
+# 0.25
+sensor_delay = 0.02
+interp_delay = 0.1
+control_delay = 0.2
 #Producer function
 def sensor(bus12,sensor_delay):
 
@@ -80,6 +83,11 @@ def interpreter(bus12, bus23,interp_delay):
 
     while not shutdown_event.is_set():
         frame, identifier = bus12.read()
+
+        if frame is None:
+            print("No frame available")
+            time.sleep(interp_delay)  # Sleep briefly to avoid busy waiting
+            continue
 
         print(f"{identifier} picked up from bus 12")
 
@@ -121,11 +129,18 @@ def interpreter(bus12, bus23,interp_delay):
 #Consumer function -- Changes angle based on x_value
 def controller(bus23,control_delay):
     C = CONTROL(px, scale_factor = 30)
+    
     while not shutdown_event.is_set():
-        x = bus23.read()
+        x, identifier = bus23.read()
+        if x is None:
+            print("NO X VALUE FROM BUS 23")
+            time.sleep(control_delay)
+            continue
+        print("X RATIO CONTROLLER YIPPIE:", x)
         xval = -1*x
         C.correct_car(xval)
         time.sleep(control_delay)
+        px.forward(25)
 
 # Exception handle function
 def handle_exception(future):
