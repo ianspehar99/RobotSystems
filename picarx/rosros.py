@@ -4,8 +4,10 @@ from vilib import Vilib
 from picarx_improved import Picarx
 from sensor_classes_w3 import CONTROL
 import time
-import rossros as rr
-
+import ROSS as rr
+import logging
+# logging.getLogger().setLevel(logging.DEBUG)
+logging.getLogger().setLevel(logging.INFO)
 px = Picarx()
 
 #Line following functions:
@@ -99,7 +101,81 @@ def sonic_stop(distance):
 #Then, use rr.run_concurrently with that comprehensive list as the input
 
 
+#Create buses, 2 for the control, 1 for ultrasonic
+cam_bus = rr.Bus(sensor_cam(), "Sensor out bus")
+interp_bus = rr.Bus(interp_cam(), "Interp out bus")
+ultrasonic_bus = rr.Bus(sonic_sensor(), "Ultrasonic out bus")
+bTerminate = rr.Bus(0, "Termination Bus")
 
- 
+#Create the wrappers for each producer/consumer
+
+#Camera thread 
+
+camera_write = rr.Producer( sensor_cam,  # function that will generate data
+    cam_bus,  # output data bus
+    0.05,  # delay between data generation cycles
+    bTerminate,  # bus to watch for termination signal
+    "Read camera frame")
+interp_readwrite = rr.ConsumerProducer(
+    interp_cam,  # function that will process data
+    cam_bus,  # input data bus
+    interp_bus,  # output data bus
+    0.05,  # delay between data control cycles
+    bTerminate,  # bus to watch for termination signal
+    "Read cam, write x")
+anglecontrol_read = rr.Consumer(
+    angle_controller,  # function that will process data
+    interp_bus,  # input data bus
+    0.05,  # delay between data control cycles
+    bTerminate,  # bus to watch for termination signal
+    "Read x, control car")
+
+#Sonic sensor thread
+
+sonic_write = rr.Producer(sonic_sensor,  # function that will generate data
+    ultrasonic_bus,  # output data bus
+    0.05,  # delay between data generation cycles
+    bTerminate,  # bus to watch for termination signal
+    "Write sonic sensor")
+
+sonic_read = rr.Consumer(
+    sonic_stop,  # function that will process data
+    ultrasonic_bus,  # input data bus
+    0.05,  # delay between data control cycles
+    bTerminate,  # bus to watch for termination signal
+    "Read sonic, stop car?")
+
+
+
+
+# Make a printer that returns the most recent wave and product values
+printBuses = rr.Printer(
+    (cam_bus, interp_bus, ultrasonic_bus, bTerminate),  # input data buses
+    # bMultiplied,      # input data buses
+    0.25,  # delay between printing cycles
+    bTerminate,  # bus to watch for termination signal
+    "Print raw and derived data",  # Name of printer
+    "Data bus readings are: ")  # Prefix for output
+
+# Make a timer (a special kind of producer) that turns on the termination
+# bus when it triggers
+terminationTimer = rr.Timer(
+    bTerminate,  # Output data bus
+    3,  # Duration
+    0.01,  # Delay between checking for termination time
+    bTerminate,  # Bus to check for termination signal
+    "Termination timer")  # Name of this timer
+
+
+# Create a list of producer-consumers to execute concurrently
+producer_consumer_list = [camera_write,
+                          interp_readwrite,
+                          anglecontrol_read,
+                          sonic_write,
+                          sonic_read
+                        ]
+
+# Execute the list of producer-consumers concurrently
+rr.runConcurrently(producer_consumer_list) 
 
         

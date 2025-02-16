@@ -65,6 +65,7 @@ def sensor(bus12,sensor_delay):
             if Vilib.img is not None and isinstance(Vilib.img, np.ndarray):
                 cv2.imwrite(full_path, Vilib.img)  # Save the image
                 t += 1
+                time.sleep(0.03)
                 frame = cv2.imread(f'{path}/{name}.jpg')
                 #print("Image", t, "saved successfully.")
                 bus12.write(frame, name)
@@ -83,7 +84,7 @@ def interpreter(bus12, bus23,interp_delay):
 
     while not shutdown_event.is_set():
         frame, identifier = bus12.read()
-
+    
         if frame is None:
             print("No frame available")
             time.sleep(interp_delay)  # Sleep briefly to avoid busy waiting
